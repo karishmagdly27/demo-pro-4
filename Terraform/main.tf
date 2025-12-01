@@ -10,6 +10,7 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = "ap-east-1"
+  profile = "jenkins"
 }
 
 # create security group for the ec2 instance
