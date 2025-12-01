@@ -6,7 +6,6 @@ variable "key_name" {
   default = "pro4"                  # Names of key in aws
 }
 
-
 variable "access_key" {
   default = "insert"                # aws access key
 }
