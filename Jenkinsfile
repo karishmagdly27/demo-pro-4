@@ -60,6 +60,14 @@ pipeline{
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // If you have KUBECONFIG configured on Jenkins, it will use it automatically
+                    sh 'kubectl apply -f K8S/manifest.yaml'
+                }
+            }
+        }
         stage("TRIVY"){
             steps{
                 sh "trivy image karishma027/demopro4:latest > trivyimage.txt" 
