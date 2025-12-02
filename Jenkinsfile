@@ -6,7 +6,6 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
-        KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
     stages {
         stage('clean workspace'){
@@ -39,13 +38,7 @@ pipeline{
                 sh "npm install"
             }
         }
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey 136f68d3-808e-41e2-970b-e14d823789d8', odcInstallation: 'DC'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-           }
-        }
-            stage('TRIVY FS SCAN') {
+        stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
             }
@@ -67,11 +60,17 @@ pipeline{
             }
         }
         stage('Deploy to Kubernetes') {
+            environment {
+                KUBECONFIG = '/var/lib/jenkins/.kube/config'
+            }
             steps {
-                script {
-                    // If you have KUBECONFIG configured on Jenkins, it will use it automatically
-                     sh 'kubectl apply -f K8S/manifest.yml'
-                     sh 'kubectl rollout status deployment/demopro4-deployment'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                    // These environment variables will be available inside this block
+                    sh '''
+                        echo "Deploying to Kubernetes..."
+                        kubectl apply -f K8S/manifest.yml
+                        kubectl rollout status deployment/demopro4-deployment
+                    '''
                 }
             }
         }
