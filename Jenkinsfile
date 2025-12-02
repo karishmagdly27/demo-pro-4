@@ -6,6 +6,7 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
     stages {
         stage('clean workspace'){
@@ -60,25 +61,20 @@ pipeline{
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    // If you have KUBECONFIG configured on Jenkins, it will use it automatically
-                    sh 'kubectl apply -f K8S/manifest.yaml'
-                }
-            }
-        }
         stage("TRIVY"){
             steps{
                 sh "trivy image karishma027/demopro4:latest > trivyimage.txt" 
             }
         }
-        stage('Deploy to container'){
-            steps{
-                sh 'docker run -d --name demopro4 -p 3000:3000 karishma027/demopro4:latest'
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // If you have KUBECONFIG configured on Jenkins, it will use it automatically
+                     sh 'kubectl apply -f K8S/manifest.yml'
+                     sh 'kubectl rollout status deployment/demopro4-deployment'
+                }
             }
         }
-
     }
     post {
     always {
