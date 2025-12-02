@@ -9,7 +9,9 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "ap-east-1"
+  region     = "us-east-1"
+  access_key = var.access_key
+  secret_key = var.secret_key
 }
 
 # create security group for the ec2 instance
