@@ -2,33 +2,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hotstar-deployment
+  name: demopro4-deployment
 spec:
   replicas: 2
   strategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: hotstar
+      app: demopro4
   template:
     metadata:
       labels:
-        app: hotstar
+        app: demopro4
     spec:
       containers:
-      - name: hotstar-container
-        image: aseemakram19/hotstar
+      - name: demopro4-container
+        image: karishma027/demopro4
         ports:
         - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hotstar-service
+  name: demopro4-service
 spec:
   type: LoadBalancer
   selector:
-    app: hotstar
+    app: demopro4
   ports:
   - port: 80
     targetPort: 3000
