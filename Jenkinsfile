@@ -64,16 +64,30 @@ pipeline{
                 KUBECONFIG = '/var/lib/jenkins/.kube/config'
             }
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
-                    // These environment variables will be available inside this block
-                    sh '''
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+        
+                    sh """
+                        echo "Configuring AWS credentials..."
+        
+                        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                        export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+        
                         echo "Deploying to Kubernetes..."
                         kubectl apply -f K8S/manifest.yml
+        
+                        echo "Checking rollout status..."
                         kubectl rollout status deployment/demopro4-deployment
-                    '''
+                    """
                 }
             }
         }
+
     }
     post {
     always {
